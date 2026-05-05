@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 
 from library.models import Book
@@ -13,3 +14,6 @@ class BookViewSet(viewsets.ModelViewSet):
             return BookCreateUpdateSerializer
         else:
             return BookSerializer
+
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ['author', 'year_published', 'genres']
