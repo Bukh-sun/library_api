@@ -8,6 +8,7 @@ from library.serializers import BookSerializer, BookCreateUpdateSerializer
 
 class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
+    ordering = ('id',)
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
