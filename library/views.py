@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 
@@ -7,8 +6,7 @@ from library.serializers import BookSerializer, BookCreateUpdateSerializer
 
 
 class BookViewSet(viewsets.ModelViewSet):
-    queryset = Book.objects.all()
-    ordering = ('id',)
+    queryset = Book.objects.select_related('author').prefetch_related('genres')
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
