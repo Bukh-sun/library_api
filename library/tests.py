@@ -3,10 +3,12 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from .models import Author, Book, Genre
 from datetime import datetime
+from django.contrib.auth.models import User
 
 class BookAPITestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.user = User.objects.create_user(username='admin', password='1234')
         self.author = Author.objects.create(first_name='Varlam', last_name='Shalamov',
                                                    country='Soviet Union', birth_date=datetime(1933, 12, 17))
         self.author2 = Author.objects.create(first_name='Boris', last_name='Kagar',
@@ -35,7 +37,7 @@ class BookAPITestCase(TestCase):
         response = self.client.get('/api/books/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         books = response.data['results']
-        self.assertGreaterEqual(len(books), 1)
+        self.assertGreaterEqual(len(books), 3)
 
     def test_get_author_books(self):
         response = self.client.get(f'/api/books/?author={self.author2.id}')
@@ -46,6 +48,7 @@ class BookAPITestCase(TestCase):
             self.assertEqual(book['author_detail']['id'], self.author2.id)
 
     def test_create_book(self):
+        self.client.force_authenticate(user=self.user)
         url = '/api/books/'
         data = {
             'title': 'Kolyma tells',
@@ -56,3 +59,33 @@ class BookAPITestCase(TestCase):
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_unauthorized_create_book(self):
+        url = '/api/books/'
+        data = {
+            'title': 'One day of ',
+            'author': self.author.id,
+            'year_published': 1915,
+            'description': 'Stories about labour camps 2',
+            'genres': [self.genre.id],
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_token(self):
+        url = '/api/token/'
+        data = {'username': 'admin',
+                'password': '1234'
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('access', response.data)
+        self.assertIn('refresh', response.data)
+
+    def test_wrong_password_get_token(self):
+        url = '/api/token/'
+        data = {'username': 'admin',
+                'password': '5678'}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+

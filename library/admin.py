@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.contrib.admin.widgets import AdminDateWidget
 from django.forms import TextInput
 
 from library.models import *
