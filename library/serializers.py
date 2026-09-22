@@ -5,16 +5,24 @@ from rest_framework import serializers
 from library.models import Book, Author, Genre
 
 
+class BookTitleIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        fields = ['id', 'title']
+
+
 class AuthorSerializer(serializers.ModelSerializer):
+    books = BookTitleIdSerializer(many=True, read_only=True)
     class Meta:
         model = Author
-        fields = ['id', 'first_name', 'last_name', 'country', 'birth_date']
+        fields = ['id', 'first_name', 'last_name', 'country', 'birth_date', 'books']
         read_only_fields = ['id']
 
 class GenreSerializer(serializers.ModelSerializer):
+    books = BookTitleIdSerializer(many=True, read_only=True)
     class Meta:
         model = Genre
-        fields = ['id', 'name', 'brief_description']
+        fields = ['id', 'name', 'brief_description', 'books']
         read_only_fields = ['id']
 
 class BookSerializer(serializers.ModelSerializer):

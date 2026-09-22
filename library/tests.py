@@ -82,6 +82,7 @@ class BookAPITestCase(TestCase):
         self.assertIn('access', response.data)
         self.assertIn('refresh', response.data)
 
+
     def test_wrong_password_get_token(self):
         url = '/api/token/'
         data = {'username': 'admin',
@@ -89,3 +90,24 @@ class BookAPITestCase(TestCase):
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+
+    def test_get_author_list(self):
+        url = '/api/authors/'
+        response = self.client.get(url)
+        result = response.data['results']
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertGreaterEqual(len(result), 2)
+
+    def test_get_author_detail(self):
+        url = f'/api/authors/{self.author.id}/'
+        response = self.client.get(url)
+        books = response.data['books']
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(books), 2)
+
+    def test_get_genre_list(self):
+        url = '/api/genres/'
+        response = self.client.get(url)
+        genres = response.data['results']
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertGreaterEqual(len(genres), 1)

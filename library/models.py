@@ -18,6 +18,9 @@ class Book(models.Model):
         return self.title
 
 class Author(models.Model):
+    class Meta:
+        ordering = ('last_name', 'first_name')
+
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
@@ -30,6 +33,9 @@ class Author(models.Model):
         return f'{self.first_name} {self.last_name}'
 
 class Genre(models.Model):
+    class Meta:
+        ordering = ('id',)
+
     name = models.CharField(max_length=100)
     brief_description = models.TextField()
 

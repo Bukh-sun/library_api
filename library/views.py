@@ -1,8 +1,8 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 
-from library.models import Book
-from library.serializers import BookSerializer, BookCreateUpdateSerializer
+from library.models import Book, Author, Genre
+from library.serializers import BookSerializer, BookCreateUpdateSerializer, AuthorSerializer, GenreSerializer
 
 
 class BookViewSet(viewsets.ModelViewSet):
@@ -16,3 +16,11 @@ class BookViewSet(viewsets.ModelViewSet):
 
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ['author', 'year_published', 'genres']
+
+class AuthorViewSet(viewsets.ModelViewSet):
+    queryset = Author.objects.prefetch_related('books')
+    serializer_class = AuthorSerializer
+
+class GenreViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Genre.objects.prefetch_related('books')
+    serializer_class = GenreSerializer
