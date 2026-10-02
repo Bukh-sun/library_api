@@ -25,15 +25,26 @@ class GenreSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'brief_description', 'books']
         read_only_fields = ['id']
 
+class AuthorBriefSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Author
+        fields = ['id', 'first_name', 'last_name']
+
+class GenreBriefSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = ['id', 'name', 'brief_description']
+
 class BookSerializer(serializers.ModelSerializer):
-    author_detail = AuthorSerializer(source='author', read_only=True)
-    genre_detail = GenreSerializer(source='genres',read_only=True, many=True)
+    author_detail = AuthorBriefSerializer(source='author', read_only=True)
+    genre_detail = GenreBriefSerializer(source='genres',read_only=True, many=True)
 
     class Meta:
         model = Book
-        fields = ['id', 'title', 'year_published', 'genre_detail', 'description', 'author_detail']
+        fields = ['id', 'title', 'year_published', 'description', 'genre_detail', 'author_detail']
 
 class BookCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
-        fields = ['title', 'description', 'year_published', 'author', 'genres']
+        fields = ['id', 'title', 'description', 'year_published', 'author', 'genres']
+        read_only_fields = ['id']
