@@ -1,6 +1,8 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
+
 
 class Book(models.Model):
     class Meta:
@@ -13,6 +15,8 @@ class Book(models.Model):
     )
     description = models.TextField()
     genres = models.ManyToManyField('Genre', related_name='books', verbose_name='Genre')
+    added_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+                                 related_name='added_books', verbose_name='added by')
 
     def __str__(self):
         return self.title

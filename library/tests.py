@@ -9,6 +9,7 @@ class BookAPITestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='admin', password='1234')
+        self.user2 = User.objects.create_user(username='user2', password='1234')
         self.author = Author.objects.create(first_name='Varlam', last_name='Shalamov',
                                                    country='Soviet Union', birth_date=datetime(1933, 12, 17))
         self.author2 = Author.objects.create(first_name='Boris', last_name='Kagar',
@@ -111,3 +112,42 @@ class BookAPITestCase(TestCase):
         genres = response.data['results']
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertGreaterEqual(len(genres), 1)
+
+    def test_patch_book_by_owner(self):
+        url = '/api/books/'
+        self.client.force_authenticate(user=self.user)
+
+        data = {
+            'title': 'Something left',
+            'author': self.author2.id,
+            'year_published': 1955,
+            'description': 'Stories about communism',
+            'genres': [self.genre.id],
+        }
+        response = self.client.post(url, data, format='json')
+        new_data = {
+            'title': 'Something more left',
+        }
+        new_url = f'/api/books/{response.data["id"]}/'
+        response = self.client.patch(new_url, new_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_patch_book_by_not_owner(self):
+        url = '/api/books/'
+        self.client.force_authenticate(user=self.user)
+
+        data = {
+            'title': 'Something sad',
+            'author': self.author.id,
+            'year_published': 1951,
+            'description': 'Stories about deaths',
+            'genres': [self.genre.id],
+        }
+        response = self.client.post(url, data, format='json')
+        self.client.force_authenticate(user=self.user2)
+        new_data = {
+            'title': 'Something more terrible',
+        }
+        new_url = f'/api/books/{response.data["id"]}/'
+        response = self.client.patch(new_url, new_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

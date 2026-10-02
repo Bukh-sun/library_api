@@ -6,6 +6,8 @@ router = routers.DefaultRouter()
 router.register('books', BookViewSet, basename='book')
 router.register('authors', AuthorViewSet, basename='author')
 router.register('genres', GenreViewSet, basename='genre')
+
+
 urlpatterns = [path('', include(router.urls)),
 
 ]
