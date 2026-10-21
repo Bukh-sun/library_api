@@ -10,8 +10,10 @@ REST API для управления библиотекой (книги, авт�
 - Маршрутизация через DefaultRouter
 - База данных на PostgreSQL
 - Пагинация и фильтрация
-- Аутентификация (Token/JWT)
+- Аутентификация (JWT)
+- Права доступа: чтение - все, создание - только вошедшие пользователи, редактирование, удаление книги — только тот, кто её добавил
 - Тесты
+
 
 ## 🛠 Стек
 - Django 5.x
@@ -20,30 +22,34 @@ REST API для управления библиотекой (книги, авт�
 - django-filter
 - JWT
 - PostgreSQL
+- Docker
 
 ## 🗺 Планы
 - Custom user model
-- Docker
-
+- Деплой
+- Nginx
 
 ## 🏁 Запуск
+Нужен установленный Docker (на Windows и macOS — Docker Desktop).
 ```bash
 git clone https://github.com/Bukh-sun/library_api.git
 cd library_api
+cp .env.example .env
+#открыть .env и заполнить своими значениями (данные подключения к PostgreSQL, SECRET_KEY)
+docker compose up -d --build
+docker compose exec my_app python manage.py createsuperuser
+```
+
+### Для разработки: база в Docker, Django из IDE
+```bash
+docker compose up -d db
 python -m venv venv
-source venv/bin/activate  # или venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-```
-установить и запустить PostgreSQL
-```bash
-cp .env.example .env 
-```
-открыть .env и заполнить своими значениями (данные подключения к PostgreSQL, SECRET_KEY)
-```bash
 python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver 
-```
+python manage.py runserver 8001
+# порт на 8001, чтобы не было конфликта 
+``` 
 
 ## 📖 Документация
 После запуска доступна интерактивная документация (Swagger):
@@ -57,5 +63,5 @@ python manage.py runserver
 
 ## 🧪 Тесты
 ```bash
-python manage.py test
+docker compose exec my_app python manage.py test
 ```
