@@ -6,7 +6,7 @@ services:
     command: >
       sh -c "python manage.py migrate --noinput && 
       python manage.py collectstatic --noinput &&
-      exec gunicorn library_api.wsgi:application --bind 0.0.0.0:8000"
+      exec gunicorn library_api.wsgi:application --bind 0.0.0.0:8000 --workers 3"
 
     ports:
       - "8000:8000"
