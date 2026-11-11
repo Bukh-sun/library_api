@@ -1,3 +1,4 @@
+[![Tests](https://github.com/Bukh-sun/library_api/actions/workflows/tests.yml/badge.svg)](https://github.com/Bukh-sun/library_api/actions/workflows/tests.yml)
 # Library API
 
 REST API для управления библиотекой (книги, авторы, жанры).
