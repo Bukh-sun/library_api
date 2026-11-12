@@ -14,7 +14,8 @@ REST API для управления библиотекой (книги, авт�
 - Аутентификация (JWT)
 - Права доступа: чтение - все, создание - только вошедшие пользователи, редактирование, удаление книги — только тот, кто её добавил
 - Тесты
-
+- Nginx как reverse proxy (обратный прокси)
+- Тесты в GitHub Actions на каждый пуш и PR
 
 ## 🛠 Стек
 - Django 5.x
@@ -24,14 +25,15 @@ REST API для управления библиотекой (книги, авт�
 - JWT
 - PostgreSQL
 - Docker
+- Nginx
+- GitHub Actions
 
 ## 🗺 Планы
 - Custom user model
 - Деплой
-- Nginx
 
 ## 🏁 Запуск
-Нужен установленный Docker (на Windows и macOS — Docker Desktop).
+Нужен установленный Docker (на Windows и macOS - Docker Desktop).
 ```bash
 git clone https://github.com/Bukh-sun/library_api.git
 cd library_api
@@ -54,7 +56,7 @@ python manage.py runserver 8001
 
 ## 📖 Документация
 После запуска доступна интерактивная документация (Swagger):
-- http://127.0.0.1:8000/api/docs/
+- http://localhost/api/docs/
 
 Основные эндпоинты:
 - `/api/books/` — книги
