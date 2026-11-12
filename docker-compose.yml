@@ -8,8 +8,6 @@ services:
       python manage.py collectstatic --noinput &&
       exec gunicorn library_api.wsgi:application --bind 0.0.0.0:8000 --workers 3"
 
-    ports:
-      - "8000:8000"
     environment:
       POSTGRES_HOST: db
       POSTGRES_PORT: "5432"
@@ -38,6 +36,17 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  nginx:
+    image: nginx:1.30-alpine
+    container_name: prod-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d:ro
+    depends_on:
+      - my_app
 
 volumes:
   postgres_data:
