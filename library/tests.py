@@ -112,6 +112,8 @@ class BookAPITestCase(TestCase):
     def test_filter_books_by_title_and_author(self):
         titles = self._get_titles(f'?title=shock&author={self.author2.id}')
         self.assertEqual(titles, [])
+        titles = self._get_titles(f'?title=shock&author={self.author.id}')
+        self.assertEqual(titles, ['Shock therapy', 'Shock therapy2'])
 
     def test_filter_books_by_cyrillic_title(self):
         Book.objects.create(title='Колымские рассказы', author=self.author,
