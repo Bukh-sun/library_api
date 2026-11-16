@@ -92,6 +92,39 @@ class BookAPITestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
+    def _get_titles(self, query):
+        response = self.client.get(f'/api/books/{query}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        return sorted(book['title'] for book in response.data['results'])
+
+    def test_filter_books_by_title_case_insensitive(self):
+        titles = self._get_titles('?title=SHOCK')
+        self.assertEqual(titles, ['Shock therapy', 'Shock therapy2'])
+
+    def test_filter_books_by_partial_title(self):
+        titles = self._get_titles('?title=riph')
+        self.assertEqual(titles, ['Periphery empire'])
+
+    def test_filter_books_by_title_no_match(self):
+        titles = self._get_titles('?title=nonexistent')
+        self.assertEqual(titles, [])
+
+    def test_filter_books_by_title_and_author(self):
+        titles = self._get_titles(f'?title=shock&author={self.author2.id}')
+        self.assertEqual(titles, [])
+        titles = self._get_titles(f'?title=shock&author={self.author.id}')
+        self.assertEqual(titles, ['Shock therapy', 'Shock therapy2'])
+
+    def test_filter_books_by_cyrillic_title(self):
+        Book.objects.create(title='Колымские рассказы', author=self.author,
+                            year_published=1966, description='Рассказы о лагерях')
+        Book.objects.create(title='Левая рука тьмы', author=self.author2,
+                            year_published=1969, description='Фантастика')
+        # Upper-case query must match a lower-case substring in the middle of a title
+        self.assertEqual(self._get_titles('?title=РАССКАЗ'), ['Колымские рассказы'])
+        self.assertEqual(self._get_titles('?title=колым'), ['Колымские рассказы'])
+        self.assertEqual(self._get_titles('?title=Рука'), ['Левая рука тьмы'])
+
     def test_get_author_list(self):
         url = '/api/authors/'
         response = self.client.get(url)
