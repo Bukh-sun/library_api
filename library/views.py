@@ -1,5 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
+from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from library.filters import BookFilter
@@ -11,8 +12,9 @@ from library.serializers import BookSerializer, BookCreateUpdateSerializer, Auth
 class BookViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly, )
     queryset = Book.objects.select_related('author').prefetch_related('genres')
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, SearchFilter)
     filterset_class = BookFilter
+    search_fields = ('title', 'author__last_name')
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:

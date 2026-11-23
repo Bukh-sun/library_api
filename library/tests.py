@@ -91,11 +91,24 @@ class BookAPITestCase(TestCase):
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-
     def _get_titles(self, query):
         response = self.client.get(f'/api/books/{query}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         return sorted(book['title'] for book in response.data['results'])
+
+    def test_search_books(self):
+        titles = self._get_titles('?search=shock')
+        self.assertEqual(titles, ['Shock therapy', 'Shock therapy2'])
+        book_title = self._get_titles('?search=empire')
+        self.assertEqual(book_title, ['Periphery empire'])
+        book_author = self._get_titles('?search=shalam')
+        self.assertEqual(book_author, ['Shock therapy', 'Shock therapy2'])
+        book_two_words = self._get_titles('?search=shal shock')
+        self.assertEqual(book_two_words, ['Shock therapy', 'Shock therapy2'])
+        book_two_words_error = self._get_titles('?search=shal periphery')
+        self.assertEqual(book_two_words_error, [])
+        book_using_filter = self._get_titles('?title=shalam')
+        self.assertEqual(book_using_filter, [])
 
     def test_filter_books_by_title_case_insensitive(self):
         titles = self._get_titles('?title=SHOCK')
